@@ -13,7 +13,7 @@ Aplicação Laravel para integração com subadquirentes de pagamento, permitind
 
 1. Clone o repositório:
 ```bash
-git clone <url-do-repositorio>
+git clone git@github.com:Chris7T/integracao-subadq.git
 cd integracao-subadq
 ```
 
@@ -59,6 +59,7 @@ docker-compose exec app php artisan l5-swagger:generate
 ```
 
 A aplicação estará disponível em `http://localhost:8080`
+
 Acesse a documentação em `http://localhost:8080/api/documentation`
 
 
