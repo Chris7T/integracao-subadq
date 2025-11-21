@@ -58,7 +58,7 @@ class CompleteWithdrawFlowTest extends TestCase
 
         $withdraw = Withdraw::where('user_id', $user->id)->first();
         $this->assertNotNull($withdraw);
-        $this->assertEquals('TXN456789', $withdraw->external_id);
+        $this->assertEquals('TXN456789', $withdraw->transaction_id);
         $this->assertEquals('WD123456', $withdraw->withdraw_id);
         $this->assertEquals(StatusWithdrawEnum::PROCESSING, $withdraw->status);
         $this->assertEquals(500.00, (float) $withdraw->amount);
@@ -89,7 +89,8 @@ class CompleteWithdrawFlowTest extends TestCase
         Http::fake([
             'https://ef8513c8-fd99-4081-8963-573cd135e133.mock.pstmn.io/withdraw' => Http::response([
                 'success' => true,
-                'transaction_id' => 'WDX54321',
+                'transaction_id' => 'TXN_WDX54321',
+                'withdraw_id' => 'WDX54321',
                 'status' => 'PROCESSING',
                 'amount' => 850.00,
             ], 200),
@@ -130,13 +131,15 @@ class CompleteWithdrawFlowTest extends TestCase
 
         $withdraw = Withdraw::where('user_id', $user->id)->first();
         $this->assertNotNull($withdraw);
-        $this->assertEquals('WDX54321', $withdraw->external_id);
+        $this->assertEquals('TXN_WDX54321', $withdraw->transaction_id);
+        $this->assertEquals('WDX54321', $withdraw->withdraw_id);
         $this->assertEquals(StatusWithdrawEnum::PROCESSING, $withdraw->status);
 
         $webhookPayload = [
             'type' => 'withdraw.status_update',
+            'transaction_id' => $withdraw->transaction_id,
             'data' => [
-                'id' => 'WDX54321',
+                'id' => \Illuminate\Support\Str::uuid()->toString(),
                 'status' => 'DONE',
                 'amount' => 850.00,
                 'bank_account' => [

@@ -24,7 +24,8 @@ class WithdrawWebhookTest extends TestCase
         $withdraw = Withdraw::create([
             'user_id' => $user->id,
             'subacquirer_id' => $subacquirer->id,
-            'external_id' => 'T987654321',
+            'withdraw_id' => 'WD123456789',
+            'transaction_id' => 'T987654321',
             'amount' => 500.00,
             'status' => StatusWithdrawEnum::PENDING,
         ]);
@@ -62,15 +63,17 @@ class WithdrawWebhookTest extends TestCase
         $withdraw = Withdraw::create([
             'user_id' => $user->id,
             'subacquirer_id' => $subacquirer->id,
-            'external_id' => 'WDX54321',
+            'withdraw_id' => 'WDX54321',
+            'transaction_id' => 'TXN_WDX54321',
             'amount' => 850.00,
             'status' => StatusWithdrawEnum::PENDING,
         ]);
 
         $payload = [
             'type' => 'withdraw.status_update',
+            'transaction_id' => 'TXN_WDX54321',
             'data' => [
-                'id' => 'WDX54321',
+                'id' => \Illuminate\Support\Str::uuid()->toString(),
                 'status' => 'DONE',
                 'amount' => 850.00,
                 'bank_account' => [
@@ -97,16 +100,20 @@ class WithdrawWebhookTest extends TestCase
 
         $response = $this->postJson('/api/webhook/withdraw', $payload);
 
-        $response->assertStatus(400)
-            ->assertJson([
-                'error' => 'Invalid payload: transaction_id or data.id is required',
-            ]);
+        $response->assertStatus(422);
     }
 
     public function test_returns_404_when_withdraw_not_found(): void
     {
         $payload = [
+            'event' => 'withdraw_completed',
             'transaction_id' => 'non_existent_id',
+            'withdraw_id' => 'WD999999',
+            'status' => 'SUCCESS',
+            'amount' => 100.00,
+            'requested_at' => '2025-11-13T13:10:00Z',
+            'completed_at' => '2025-11-13T13:12:30Z',
+            'metadata' => ['test' => 'value'],
         ];
 
         $response = $this->postJson('/api/webhook/withdraw', $payload);

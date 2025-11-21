@@ -34,27 +34,26 @@ class CreatePixJob implements ShouldQueue
             $pix = Pix::create([
                 'user_id' => $this->userId,
                 'subacquirer_id' => $this->subacquirerId,
-                'external_id' => null,
+                'transaction_id' => null,
                 'pix_id' => null,
                 'amount' => $this->data['amount'],
                 'status' => StatusPixEnum::PENDING,
-                'payer_name' => $this->data['payer_name'] ?? null,
-                'payer_cpf' => $this->data['payer_cpf'] ?? null,
-                'metadata' => $this->data['metadata'] ?? [],
+                'payer_name' => $this->data['payer_name'],
+                'payer_cpf' => $this->data['payer_cpf'],
             ]);
 
             $subacquirerService = SubacquirerFactory::make($this->subacquirerId);
 
             $response = $subacquirerService->createPix([
+                'pix_id' => $pix->getKey(),
+                'user_id' => $this->userId,
                 'amount' => $this->data['amount'],
-                'payer_name' => $this->data['payer_name'] ?? null,
-                'payer_cpf' => $this->data['payer_cpf'] ?? null,
-                'metadata' => $this->data['metadata'] ?? [],
+                'payer_name' => $this->data['payer_name'],
+                'payer_cpf' => $this->data['payer_cpf'],
             ]);
 
             $pix->update([
-                'external_id' => $response['transaction_id'] ?? null,
-                'pix_id' => $response['pix_id'] ?? null,
+                'transaction_id' => $response['transaction_id'] ?? null,
                 'status' => StatusPixEnum::PROCESSING,
             ]);
 
@@ -75,16 +74,16 @@ class CreatePixJob implements ShouldQueue
         Pix::create([
             'user_id' => $this->userId,
             'subacquirer_id' => $this->subacquirerId,
-            'external_id' => null,
+            'transaction_id' => null,
             'pix_id' => null,
             'amount' => $this->data['amount'],
             'status' => StatusPixEnum::FAILED,
-            'payer_name' => $this->data['payer_name'] ?? null,
-            'payer_cpf' => $this->data['payer_cpf'] ?? null,
-            'metadata' => array_merge($this->data['metadata'] ?? [], [
+            'payer_name' => $this->data['payer_name'],
+            'payer_cpf' => $this->data['payer_cpf'],
+            'metadata' => [
                 'error' => $exception->getMessage(),
                 'failed_at' => now()->toIso8601String(),
-            ]),
+            ],
         ]);
     }
 }

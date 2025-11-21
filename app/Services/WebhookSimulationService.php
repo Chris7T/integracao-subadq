@@ -8,11 +8,9 @@ class WebhookSimulationService
     {
         $rand = rand(1, 100);
         
-        if ($rand <= 70) {
-            return null;
-        } elseif ($rand <= 85) {
+        if ($rand <= 80) {
             return $successStatus;
-        } elseif ($rand <= 95) {
+        } elseif ($rand <= 90) {
             return 'FAILED';
         } else {
             return 'CANCELLED';

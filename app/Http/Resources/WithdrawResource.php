@@ -10,7 +10,7 @@ use OpenApi\Attributes as OA;
     schema: 'WithdrawResource',
     properties: [
         new OA\Property(property: 'id', type: 'integer', example: 1),
-        new OA\Property(property: 'external_id', type: 'string', nullable: true, example: 'txn_123456'),
+        new OA\Property(property: 'transaction_id', type: 'string', nullable: true, example: 'txn_123456'),
         new OA\Property(property: 'withdraw_id', type: 'string', nullable: true, example: 'withdraw_789012'),
         new OA\Property(property: 'amount', type: 'number', format: 'float', example: 500.00),
         new OA\Property(property: 'status', type: 'string', example: 'pending'),
@@ -23,7 +23,7 @@ class WithdrawResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'external_id' => $this->external_id,
+            'transaction_id' => $this->transaction_id,
             'withdraw_id' => $this->withdraw_id,
             'amount' => $this->amount,
             'status' => $this->status->value,

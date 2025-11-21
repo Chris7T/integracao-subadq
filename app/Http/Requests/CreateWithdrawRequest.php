@@ -21,7 +21,6 @@ use OpenApi\Attributes as OA;
                 new OA\Property(property: 'account', type: 'string', example: '56789-0', description: 'Account number'),
             ]
         ),
-        new OA\Property(property: 'metadata', type: 'object', nullable: true, example: ['key' => 'value'], description: 'Additional metadata'),
     ]
 )]
 class CreateWithdrawRequest extends FormRequest
@@ -40,7 +39,6 @@ class CreateWithdrawRequest extends FormRequest
             'bank_account.bank' => ['required', 'string'],
             'bank_account.agency' => ['required', 'string'],
             'bank_account.account' => ['required', 'string'],
-            'metadata' => ['nullable', 'array'],
         ];
     }
 }

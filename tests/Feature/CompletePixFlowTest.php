@@ -56,8 +56,8 @@ class CompletePixFlowTest extends TestCase
 
         $pix = Pix::where('user_id', $user->id)->first();
         $this->assertNotNull($pix);
-        $this->assertEquals('TXN123456', $pix->external_id);
-        $this->assertEquals('PIX789012', $pix->pix_id);
+        $this->assertEquals('TXN123456', $pix->transaction_id);
+        $this->assertNull($pix->pix_id);
         $this->assertEquals(StatusPixEnum::PROCESSING, $pix->status);
         $this->assertEquals(100.50, (float) $pix->amount);
 
@@ -90,6 +90,7 @@ class CompletePixFlowTest extends TestCase
             'https://ef8513c8-fd99-4081-8963-573cd135e133.mock.pstmn.io/pix/create' => Http::response([
                 'success' => true,
                 'transaction_id' => 'PX987654',
+                'order' => 'ORDER_PX987654',
                 'status' => 'PROCESSING',
                 'value' => 250.00,
             ], 200),
@@ -128,13 +129,15 @@ class CompletePixFlowTest extends TestCase
 
         $pix = Pix::where('user_id', $user->id)->first();
         $this->assertNotNull($pix);
-        $this->assertEquals('PX987654', $pix->external_id);
+        $this->assertEquals('PX987654', $pix->transaction_id);
+        $this->assertNull($pix->pix_id);
         $this->assertEquals(StatusPixEnum::PROCESSING, $pix->status);
 
         $webhookPayload = [
             'type' => 'pix.status_update',
+            'transaction_id' => 'PX987654',
             'data' => [
-                'id' => 'PX987654',
+                'id' => \Illuminate\Support\Str::uuid()->toString(),
                 'status' => 'PAID',
                 'value' => 250.00,
                 'payer' => [

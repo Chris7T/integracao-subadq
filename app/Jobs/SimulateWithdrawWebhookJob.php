@@ -20,7 +20,7 @@ class SimulateWithdrawWebhookJob implements ShouldQueue
     public function __construct(
         public Withdraw $withdraw
     ) {
-        $this->delay(now()->addSeconds(rand(5, 30)));
+        $this->delay(now()->addSeconds(5));
     }
 
     public function handle(WebhookSimulationService $webhookSimulationService): void
@@ -38,10 +38,13 @@ class SimulateWithdrawWebhookJob implements ShouldQueue
             }
         }
 
-        $webhookUrl = config('app.url') . '/api/webhook/withdraw';
+        $webhookUrl = config('app.webhook_url') . '/api/webhook/withdraw';
 
         try {
-            $response = Http::timeout(10)->post($webhookUrl, $payload);
+            $response = Http::withHeaders([
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+            ])->timeout(10)->post($webhookUrl, $payload);
 
             if (!$response->successful()) {
                 Log::error('Webhook simulation failed', [
@@ -54,6 +57,7 @@ class SimulateWithdrawWebhookJob implements ShouldQueue
             Log::error('Error sending webhook simulation', [
                 'withdraw_id' => $this->withdraw->id,
                 'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
         }
     }

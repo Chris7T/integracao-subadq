@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use App\Exceptions\InvalidWebhookPayloadException;
 use App\Exceptions\PixNotFoundException;
 use App\Exceptions\WithdrawNotFoundException;
-use App\Http\Requests\WebhookRequest;
+use App\Http\Requests\PixWebhookRequest;
+use App\Http\Requests\WithdrawWebhookRequest;
 use App\Services\WebhookService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
@@ -24,7 +25,7 @@ class WebhookController extends Controller
         tags: ['Webhooks'],
         requestBody: new OA\RequestBody(
             required: true,
-            content: new OA\JsonContent(ref: '#/components/schemas/WebhookRequest')
+            content: new OA\JsonContent(ref: '#/components/schemas/PixWebhookRequest')
         ),
         responses: [
             new OA\Response(response: 204, description: 'Webhook processed successfully'),
@@ -55,7 +56,7 @@ class WebhookController extends Controller
             ),
         ]
     )]
-    public function pix(WebhookRequest $request): JsonResponse
+    public function pix(PixWebhookRequest $request): JsonResponse
     {
         try {
             $this->webhookService->processPix($request->validated());
@@ -85,7 +86,7 @@ class WebhookController extends Controller
         tags: ['Webhooks'],
         requestBody: new OA\RequestBody(
             required: true,
-            content: new OA\JsonContent(ref: '#/components/schemas/WebhookRequest')
+            content: new OA\JsonContent(ref: '#/components/schemas/WithdrawWebhookRequest')
         ),
         responses: [
             new OA\Response(response: 204, description: 'Webhook processed successfully'),
@@ -116,7 +117,7 @@ class WebhookController extends Controller
             ),
         ]
     )]
-    public function withdraw(WebhookRequest $request): JsonResponse
+    public function withdraw(WithdrawWebhookRequest $request): JsonResponse
     {
         try {
             $this->webhookService->processWithdraw($request->validated());

@@ -62,7 +62,6 @@ A aplicação estará disponível em `http://localhost:8080`
 
 Acesse a documentação em `http://localhost:8080/api/documentation`
 
-
 ## 🏗️ Estratégias Adotadas
 
 ### Strategy Pattern
@@ -89,3 +88,9 @@ Utilização de **Laravel Queues** com **Redis** para processar requisições de
 - Redis 7
 - Docker & Docker Compose
 - Nginx
+
+## ⚠️ Observações
+
+**Para mockar os subadquirentes**, basta configurar no `.env`:
+- `MOCK_SUBADQUIRER=true` - Usa dados mockados (não faz requisições HTTP reais)
+- `MOCK_SUBADQUIRER=false` - Faz requisições HTTP reais para as APIs

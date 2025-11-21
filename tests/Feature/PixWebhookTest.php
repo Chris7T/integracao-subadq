@@ -24,7 +24,8 @@ class PixWebhookTest extends TestCase
         $pix = Pix::create([
             'user_id' => $user->id,
             'subacquirer_id' => $subacquirer->id,
-            'external_id' => 'f1a2b3c4d5e6',
+            'transaction_id' => 'f1a2b3c4d5e6',
+            'pix_id' => 'PIX123456789',
             'amount' => 125.50,
             'status' => StatusPixEnum::PENDING,
         ]);
@@ -62,15 +63,17 @@ class PixWebhookTest extends TestCase
         $pix = Pix::create([
             'user_id' => $user->id,
             'subacquirer_id' => $subacquirer->id,
-            'external_id' => 'PX987654321',
+            'transaction_id' => 'PX987654321',
+            'pix_id' => 'PX987654321',
             'amount' => 250.00,
             'status' => StatusPixEnum::PENDING,
         ]);
 
         $payload = [
             'type' => 'pix.status_update',
+            'transaction_id' => 'PX987654321',
             'data' => [
-                'id' => 'PX987654321',
+                'id' => \Illuminate\Support\Str::uuid()->toString(),
                 'status' => 'PAID',
                 'value' => 250.00,
                 'payer' => [
@@ -96,16 +99,21 @@ class PixWebhookTest extends TestCase
 
         $response = $this->postJson('/api/webhook/pix', $payload);
 
-        $response->assertStatus(400)
-            ->assertJson([
-                'error' => 'Invalid payload: transaction_id or data.id is required',
-            ]);
+        $response->assertStatus(422);
     }
 
     public function test_returns_404_when_pix_not_found(): void
     {
         $payload = [
+            'event' => 'pix_payment_confirmed',
             'transaction_id' => 'non_existent_id',
+            'pix_id' => 'PIX999999',
+            'status' => 'CONFIRMED',
+            'amount' => 100.00,
+            'payer_name' => 'Test User',
+            'payer_cpf' => '12345678900',
+            'payment_date' => '2025-11-13T14:25:00Z',
+            'metadata' => ['test' => 'value'],
         ];
 
         $response = $this->postJson('/api/webhook/pix', $payload);

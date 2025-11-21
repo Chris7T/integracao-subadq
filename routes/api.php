@@ -10,4 +10,3 @@ Route::post('/withdraw', [WithdrawController::class, 'store']);
 
 Route::post('/webhook/pix', [WebhookController::class, 'pix']);
 Route::post('/webhook/withdraw', [WebhookController::class, 'withdraw']);
-

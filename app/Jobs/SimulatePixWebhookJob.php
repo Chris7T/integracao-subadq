@@ -20,7 +20,7 @@ class SimulatePixWebhookJob implements ShouldQueue
     public function __construct(
         public Pix $pix
     ) {
-        $this->delay(now()->addSeconds(rand(5, 30)));
+        $this->delay(now()->addSeconds(5));
     }
 
     public function handle(WebhookSimulationService $webhookSimulationService): void
@@ -38,10 +38,13 @@ class SimulatePixWebhookJob implements ShouldQueue
             }
         }
 
-        $webhookUrl = config('app.url') . '/api/webhook/pix';
+        $webhookUrl = config('app.webhook_url') . '/api/webhook/pix';
 
         try {
-            $response = Http::timeout(10)->post($webhookUrl, $payload);
+            $response = Http::withHeaders([
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+            ])->timeout(10)->post($webhookUrl, $payload);
 
             if (!$response->successful()) {
                 Log::error('Webhook simulation failed', [
@@ -54,6 +57,7 @@ class SimulatePixWebhookJob implements ShouldQueue
             Log::error('Error sending webhook simulation', [
                 'pix_id' => $this->pix->id,
                 'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
         }
     }

@@ -13,13 +13,7 @@ class WebhookService
 {
     public function processPix(array $payload): Pix
     {
-        if (!isset($payload['transaction_id']) && !isset($payload['data']['id'])) {
-            throw new InvalidWebhookPayloadException();
-        }
-
-        $transactionId = $payload['transaction_id'] ?? $payload['data']['id'] ?? null;
-        
-        $pix = Pix::where('external_id', $transactionId)->first();
+        $pix = Pix::where('transaction_id', $payload['transaction_id'])->first();
 
         if (!$pix) {
             throw new PixNotFoundException();
@@ -32,13 +26,7 @@ class WebhookService
 
     public function processWithdraw(array $payload): Withdraw
     {
-        if (!isset($payload['transaction_id']) && !isset($payload['data']['id'])) {
-            throw new InvalidWebhookPayloadException();
-        }
-
-        $transactionId = $payload['transaction_id'] ?? $payload['data']['id'] ?? null;
-        
-        $withdraw = Withdraw::where('external_id', $transactionId)->first();
+        $withdraw = Withdraw::where('transaction_id', $payload['transaction_id'])->first();
 
         if (!$withdraw) {
             throw new WithdrawNotFoundException();

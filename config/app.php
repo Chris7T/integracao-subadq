@@ -54,6 +54,10 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    'webhook_url' => env('WEBHOOK_URL', 'http://nginx'),
+
+    'mock_subadquirer' => env('MOCK_SUBADQUIRER', false),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

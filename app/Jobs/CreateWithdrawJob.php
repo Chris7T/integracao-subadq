@@ -34,27 +34,26 @@ class CreateWithdrawJob implements ShouldQueue
             $withdraw = Withdraw::create([
                 'user_id' => $this->userId,
                 'subacquirer_id' => $this->subacquirerId,
-                'external_id' => null,
                 'withdraw_id' => null,
                 'transaction_id' => null,
                 'amount' => $this->data['amount'],
                 'status' => StatusWithdrawEnum::PENDING,
                 'bank_account' => $this->data['bank_account'],
-                'metadata' => $this->data['metadata'] ?? [],
+                'metadata' => [],
             ]);
 
             $subacquirerService = SubacquirerFactory::make($this->subacquirerId);
 
             $response = $subacquirerService->createWithdraw([
+                'user_id' => $this->userId,
                 'amount' => $this->data['amount'],
                 'bank_account' => $this->data['bank_account'],
-                'metadata' => $this->data['metadata'] ?? [],
+                'metadata' => [],
             ]);
 
             $withdraw->update([
-                'external_id' => $response['transaction_id'] ?? null,
-                'withdraw_id' => $response['withdraw_id'] ?? null,
                 'transaction_id' => $response['transaction_id'] ?? null,
+                'withdraw_id' => $response['withdraw_id'] ?? null,
                 'status' => StatusWithdrawEnum::PROCESSING,
             ]);
 
@@ -75,16 +74,15 @@ class CreateWithdrawJob implements ShouldQueue
         Withdraw::create([
             'user_id' => $this->userId,
             'subacquirer_id' => $this->subacquirerId,
-            'external_id' => null,
             'withdraw_id' => null,
             'transaction_id' => null,
             'amount' => $this->data['amount'],
             'status' => StatusWithdrawEnum::FAILED,
             'bank_account' => $this->data['bank_account'],
-            'metadata' => array_merge($this->data['metadata'] ?? [], [
+            'metadata' => [
                 'error' => $exception->getMessage(),
                 'failed_at' => now()->toIso8601String(),
-            ]),
+            ],
         ]);
     }
 }

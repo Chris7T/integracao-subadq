@@ -11,7 +11,6 @@ class Withdraw extends Model
     protected $fillable = [
         'user_id',
         'subacquirer_id',
-        'external_id',
         'withdraw_id',
         'transaction_id',
         'amount',
