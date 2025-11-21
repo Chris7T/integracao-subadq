@@ -62,6 +62,11 @@ A aplicação estará disponível em `http://localhost:8080`
 
 Acesse a documentação em `http://localhost:8080/api/documentation`
 
+10. Execute os testes:
+```bash
+docker-compose exec app php artisan test
+```
+
 ## 🏗️ Estratégias Adotadas
 
 ### Strategy Pattern
